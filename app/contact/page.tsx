@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/layout/PageHeader";
 import ContactForm from "@/components/sections/ContactForm";
 import { site, waLink } from "@/lib/site";
@@ -9,17 +10,13 @@ const MAPS_EMBED =
   "https://www.google.com/maps?q=Mampoyil%2C+Chunkathara%2C+Malappuram%2C+Kerala+676505&output=embed";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/contact", {
-  title: "Book Consultation | +91 9447412319",
-  description:
-    "Book a consultation at Sree Kayakalpam Vaidyashala, Mampoyil, Chunkathara, Malappuram, Kerala. Call or WhatsApp +91 9447412319 or send an enquiry online.",
-  alternates: { canonical: "/contact" },
-  });
+  return buildMetadata("/contact");
 }
 
 export default function ContactPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Contact", "/contact"]])} />
       <PageHeader
         image="/images/consult.jpg"
         alt="Vaidyar Shine Bhaskar at the consultation desk"

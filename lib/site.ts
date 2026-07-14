@@ -34,6 +34,7 @@ export const nav = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/treatments", label: "Treatments" },
+  { href: "/visha-chikitsa", label: "Visha Chikitsa" },
   { href: "/conditions", label: "Conditions" },
   { href: "/telemedicine", label: "Telemedicine" },
   { href: "/gallery", label: "Gallery" },
@@ -56,6 +57,7 @@ export const navGroups: NavItem[] = [
     label: "Services",
     children: [
       { href: "/treatments", label: "Treatments" },
+      { href: "/visha-chikitsa", label: "Visha Chikitsa" },
       { href: "/conditions", label: "Conditions" },
       { href: "/telemedicine", label: "Telemedicine" },
     ],

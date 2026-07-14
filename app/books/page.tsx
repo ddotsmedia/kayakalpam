@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/layout/PageHeader";
 import SectionHeading from "@/components/ui/SectionHeading";
 import BookCard from "@/components/ui/BookCard";
@@ -7,17 +8,13 @@ import CtaBanner from "@/components/sections/CtaBanner";
 import { books } from "@/lib/books";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/books", {
-  title: "Published Works | Ayurveda Books in Malayalam",
-  description:
-    "Malayalam Ayurveda books by Vaidyar Shine Bhaskar — 'Visha Chikitsa Agadam Amrutham' and 'Vaidyayanam'. Enquire to order from Sree Kayakalpam Vaidyashala.",
-  alternates: { canonical: "/books" },
-  });
+  return buildMetadata("/books");
 }
 
 export default function BooksPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Books", "/books"]])} />
       <PageHeader
         image="/images/book-visha.jpg"
         alt="Cover of Visha Chikitsa Agadam Amrutham"

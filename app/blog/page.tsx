@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import Link from "next/link";
 import Image from "next/image";
 import BlogClient from "@/components/sections/BlogClient";
@@ -8,12 +9,7 @@ import { getArticles } from "@/lib/articlesData";
 import { formatDate } from "@/lib/articles";
 
 export function generateMetadata(): Metadata {
-  const count = getArticles().length;
-  return seoMeta("/blog", {
-    title: "Articles & Health Tips | Sree Kayakalpam Vaidyashala",
-    description: `${count} articles on Ayurveda, Visha Chikitsa, treatments and seasonal health tips by Vaidyar Shine Bhaskar, Malappuram Kerala.`,
-    alternates: { canonical: "/blog" },
-  });
+  return buildMetadata("/blog");
 }
 
 export default function BlogPage() {
@@ -23,6 +19,7 @@ export default function BlogPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Articles", "/blog"]])} />
       <section className="bg-[#1a3a2a] py-14 text-center text-white">
         <p className="font-ml text-lg text-secondary">ലേഖനങ്ങൾ</p>
         <h1 className="mt-1 font-heading text-4xl font-bold sm:text-5xl">Articles & Health Tips</h1>

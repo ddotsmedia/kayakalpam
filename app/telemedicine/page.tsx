@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import { ClipboardList, CalendarDays, Pill, Globe } from "lucide-react";
 import TelemedicineForm from "@/components/sections/TelemedicineForm";
 import Accordion from "@/components/ui/Accordion";
@@ -8,12 +9,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import { site, waLink } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/telemedicine", {
-  title: "Online Ayurvedic Consultation | Vaidyar Shine Bhaskar | Sree Kayakalpam Vaidyashala",
-  description:
-    "Book an online Ayurvedic consultation with Vaidyar Shine Bhaskar from anywhere in the world. Video consultation via WhatsApp or Google Meet. Ideal for NRI patients and Kerala diaspora.",
-  alternates: { canonical: "/telemedicine" },
-  });
+  return buildMetadata("/telemedicine");
 }
 
 const steps = [
@@ -33,6 +29,7 @@ const faqs = [
 export default function TelemedicinePage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Online Consultation", "/telemedicine"]])} />
       {/* 1 — Hero */}
       <section className="bg-gradient-to-br from-[#0f2a1a] to-[#2d6a4f] py-16 text-white">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 md:grid-cols-2">

@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import ArticleBody from "@/components/sections/ArticleBody";
 import ShareRow from "@/components/sections/ShareRow";
 import ArticleCard from "@/components/ui/ArticleCard";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbLd } from "@/lib/seo-meta";
 import { getArticles, getArticle } from "@/lib/articlesData";
 import { formatDate } from "@/lib/articles";
 import { site, waLink } from "@/lib/site";
@@ -21,11 +23,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const a = getArticle(slug);
   if (!a) return { title: "Article Not Found" };
+  const canonical = `${site.url}/blog/${a.slug}`;
   return {
     title: `${a.titleEn} | Articles`,
     description: a.excerpt,
     alternates: { canonical: `/blog/${a.slug}` },
-    openGraph: { type: "article", images: [{ url: a.coverImage }] },
+    openGraph: {
+      type: "article",
+      title: a.titleEn,
+      description: a.excerpt,
+      url: canonical,
+      publishedTime: a.publishedAt,
+      modifiedTime: a.updatedAt,
+      images: [{ url: a.coverImage }],
+    },
+    twitter: { card: "summary_large_image", title: a.titleEn, description: a.excerpt, images: [a.coverImage] },
   };
 }
 
@@ -39,14 +51,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     .slice(0, 2);
   const url = `${site.url}/blog/${a.slug}`;
 
-  const jsonLd = {
+  const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: a.titleEn,
     description: a.excerpt,
     image: `${site.url}${a.coverImage}`,
     author: { "@type": "Person", name: a.author },
-    publisher: { "@type": "Organization", name: site.name },
+    publisher: {
+      "@type": "Organization",
+      name: site.name,
+      url: site.url,
+      logo: { "@type": "ImageObject", url: `${site.url}/images/hero.jpg` },
+    },
     datePublished: a.publishedAt,
     dateModified: a.updatedAt,
     mainEntityOfPage: url,
@@ -54,7 +71,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={articleLd} />
+      <JsonLd
+        data={breadcrumbLd([
+          ["Home", "/"],
+          ["Articles", "/blog"],
+          [a.titleEn, `/blog/${a.slug}`],
+        ])}
+      />
 
       <section className="relative isolate flex min-h-[40vh] items-end">
         <Image src={a.coverImage} alt={a.titleEn} fill priority sizes="100vw" className="object-cover" />

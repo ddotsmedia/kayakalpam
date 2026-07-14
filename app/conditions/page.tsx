@@ -1,22 +1,19 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/layout/PageHeader";
 import CtaBanner from "@/components/sections/CtaBanner";
 import Icon from "@/components/ui/Icon";
 import { conditions } from "@/lib/conditions";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/conditions", {
-  title: "Conditions Treated | Snakebite, Arthritis, Paralysis & More",
-  description:
-    "Conditions treated at Sree Kayakalpam Vaidyashala — snakebite and scorpion sting (Visha Chikitsa), arthritis, paralysis, skin and digestive disorders, and more, Malappuram Kerala.",
-  alternates: { canonical: "/conditions" },
-  });
+  return buildMetadata("/conditions");
 }
 
 export default function ConditionsPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Conditions Treated", "/conditions"]])} />
       <PageHeader
         image="/images/pharmacy-2.jpg"
         alt="Vaidyar at the medicine shelves"

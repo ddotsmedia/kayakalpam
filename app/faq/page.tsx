@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/layout/PageHeader";
 import Accordion from "@/components/ui/Accordion";
 import CtaBanner from "@/components/sections/CtaBanner";
 import { faqs } from "@/lib/faqs";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/faq", {
-  title: "FAQs | Traditional & Visha Chikitsa",
-  description:
-    "Frequently asked questions about Ayurveda and Visha Chikitsa at Sree Kayakalpam Vaidyashala, Malappuram — treatments, medicines, doshas and booking.",
-  alternates: { canonical: "/faq" },
-  });
+  return buildMetadata("/faq");
 }
 
 const faqJsonLd = {
@@ -27,6 +23,7 @@ const faqJsonLd = {
 export default function FaqPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["FAQ", "/faq"]])} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

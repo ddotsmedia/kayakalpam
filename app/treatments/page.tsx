@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/layout/PageHeader";
 import Button from "@/components/ui/Button";
 import CtaBanner from "@/components/sections/CtaBanner";
@@ -8,17 +9,13 @@ import { treatments } from "@/lib/treatments";
 import { waLink } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/treatments", {
-  title: "Kerala Ayurvedic Treatments | Visha Chikitsa, Kayakalpa, Panchakarma",
-  description:
-    "Authentic Kerala Ayurvedic treatments at Sree Kayakalpam Vaidyashala, Malappuram — Visha Chikitsa, Kayakalpa, Panchakarma, Shirodhara, Njavara Kizhi, Pizhichil and classical medicines.",
-  alternates: { canonical: "/treatments" },
-  });
+  return buildMetadata("/treatments");
 }
 
 export default function TreatmentsPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Treatments", "/treatments"]])} />
       <PageHeader
         image="/images/herbs.jpg"
         alt="Vaidyar selecting herbs at the herbal store"

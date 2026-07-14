@@ -1,10 +1,19 @@
+import Link from "next/link";
 import { MapPin, Phone, Clock } from "lucide-react";
 import { site } from "@/lib/site";
+
+const popular = [
+  { href: "/visha-chikitsa", label: "Visha Chikitsa" },
+  { href: "/karkidaka", label: "Karkidaka Chikitsa" },
+  { href: "/treatments", label: "Treatments" },
+  { href: "/telemedicine", label: "Online Consultation" },
+  { href: "/conditions", label: "Conditions Treated" },
+];
 
 export default function Footer() {
   return (
     <footer className="bg-primary-dark text-white/90">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-3">
         {/* Brand */}
         <div>
           <h3 className="font-heading text-lg font-bold text-white">{site.name}</h3>
@@ -20,8 +29,22 @@ export default function Footer() {
           </p>
         </div>
 
+        {/* Popular pages */}
+        <div>
+          <h4 className="font-semibold text-white">Popular</h4>
+          <ul className="mt-3 space-y-2 text-sm">
+            {popular.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="text-white/70 hover:text-secondary">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Contact */}
-        <div className="sm:justify-self-end">
+        <div className="lg:justify-self-end">
           <h4 className="font-semibold text-white">Contact</h4>
           <ul className="mt-3 space-y-3 text-sm text-white/75">
             <li className="flex items-start gap-2">

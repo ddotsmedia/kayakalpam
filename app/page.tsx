@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo-meta";
 import Image from "next/image";
 import { BookOpen, Shield, FlaskConical, Star, GitBranch, Flame, Heart } from "lucide-react";
 import Hero from "@/components/sections/Hero";
@@ -44,7 +44,7 @@ const why = [
 ];
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/", { alternates: { canonical: "/" } });
+  return buildMetadata("/");
 }
 
 export default function Home() {

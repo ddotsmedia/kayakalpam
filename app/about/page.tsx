@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { seoMeta } from "@/lib/seo";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
 import Image from "next/image";
 import PageHeader from "@/components/layout/PageHeader";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -9,17 +10,13 @@ import { books } from "@/lib/books";
 import { site } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
-  return seoMeta("/about", {
-  title: "About Vaidyar Shine Bhaskar | Published Ayurveda Author",
-  description:
-    "Vaidyar Shine Bhaskar — published author, rare Visha Chikitsa specialist and hereditary Kerala Ayurveda physician at Sree Kayakalpam Vaidyashala, Malappuram.",
-  alternates: { canonical: "/about" },
-  });
+  return buildMetadata("/about");
 }
 
 export default function AboutPage() {
   return (
     <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["About", "/about"]])} />
       <PageHeader
         image="/images/hero.jpg"
         alt="Sree Kayakalpam Vaidyashala consultation room"

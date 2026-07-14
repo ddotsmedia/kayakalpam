@@ -8,7 +8,7 @@ const KEY = "skv-banner-dismissed";
 
 export default function SeasonalBanner() {
   const [show, setShow] = useState(false);
-  const [campaign, setCampaign] = useState({ message: "", cta: "" });
+  const [campaign, setCampaign] = useState({ message: "", cta: "", href: "/contact" });
 
   useEffect(() => {
     setCampaign(getSeasonCampaign());
@@ -23,7 +23,7 @@ export default function SeasonalBanner() {
         <div className="flex flex-1 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
           <span className="text-xs sm:text-sm">{campaign.message}</span>
           <Link
-            href="/contact"
+            href={campaign.href || "/contact"}
             className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold hover:bg-white hover:text-accent"
           >
             {campaign.cta}
