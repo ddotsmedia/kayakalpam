@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://kayakalpamvaidyasala.com
+
+# Sitemaps
+Sitemap: https://kayakalpamvaidyasala.com/sitemap.xml

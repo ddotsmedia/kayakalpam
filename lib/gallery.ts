@@ -1,0 +1,17 @@
+export type GalleryImage = {
+  src: string;
+  category: string;
+  captionEn: string;
+  captionMl: string;
+};
+
+export const galleryCategories = ["All", "Clinic", "Medicines", "Treatments", "Vaidyar"];
+
+export const galleryFallback: GalleryImage[] = [
+  { src: "/images/hero.jpg", category: "Vaidyar", captionEn: "Vaidyar Shine Bhaskar at consultation", captionMl: "വൈദ്യർ ഷൈൻ ഭാസ്കർ" },
+  { src: "/images/consult.jpg", category: "Clinic", captionEn: "Traditional consultation room", captionMl: "ചികിൽസ മുറി" },
+  { src: "/images/pharmacy-1.jpg", category: "Medicines", captionEn: "In-house herbal medicine store", captionMl: "ഔഷധ ശേഖരം" },
+  { src: "/images/pharmacy-2.jpg", category: "Medicines", captionEn: "Classical medicine collection", captionMl: "പാരമ്പര്യ ഔഷധങ്ങൾ" },
+  { src: "/images/medicine.jpg", category: "Medicines", captionEn: "Traditional wood-fire medicine preparation", captionMl: "പരമ്പരാഗത ഔഷധ നിർമ്മാണം" },
+  { src: "/images/herbs.jpg", category: "Treatments", captionEn: "Vaidyar with medicinal herbs", captionMl: "ഔഷധ സസ്യങ്ങൾ" },
+];

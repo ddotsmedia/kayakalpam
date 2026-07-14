@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #2d6a4f;
+  --color-primary-dark: #1f4d39;
+  --color-secondary: #c9962a;
+  --color-accent: #7b3f00;
+  --color-bg: #fdf6ec;
+  --color-text: #3d3d3d;
+  --color-muted: #6b7280;
+
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-nunito), sans-serif;
+  --font-ml: var(--font-noto-ml), sans-serif;
+}
+
+:root {
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+}
+
+.font-ml {
+  font-family: var(--font-ml);
+}
+
+html {
+  scroll-behavior: smooth;
+}

@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npx --version)",
+      "Bash(mkdir -p /c/websites/_kayak_src)",
+      "Bash(mv WhatsApp* /c/websites/_kayak_src/)",
+      "Read(//c/websites/**)",
+      "Bash(npx --yes create-next-app@latest kayak-build --ts --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --turbopack)",
+      "Bash(mkdir -p /c/websites/kayakalpam/public/images)",
+      "Bash(cp \"WhatsApp Image 2026-06-17 at 12.16.18 PM.jpeg\"   /c/websites/kayakalpam/public/images/hero.jpg)",
+      "Bash(cp \"WhatsApp Image 20426-06-17 at 12.16.17 PM.jpeg\"  /c/websites/kayakalpam/public/images/consult.jpg)",
+      "Bash(cp \"WhatsApp Image 2026-06-17 at 12.16.17 PM.jpeg\"   /c/websites/kayakalpam/public/images/pharmacy-1.jpg)",
+      "Bash(cp \"WhatsApp Image 2026-06-17 at 312.16.17 PM.jpeg\"  /c/websites/kayakalpam/public/images/pharmacy-2.jpg)",
+      "Bash(git check-ignore *)",
+      "Bash(git branch *)",
+      "Bash(git add *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'feat: scaffold full Sree Kayakalpam Vaidyashala site \\(steps 1-14\\) *)",
+      "Bash(gh auth *)",
+      "Read(//c/Users/web/.ssh/**)",
+      "Bash(timeout 6 bash -c 'cat < /dev/null > /dev/tcp/194.164.151.202/22')",
+      "Bash(ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -T git@github.com)",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@194.164.151.202 'echo VPS_OK; whoami; ls -d /opt/kayakalpam 2>/dev/null || echo \"no /opt/kayakalpam yet\"')",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@194.164.151.202 'echo \"=node=\"; node -v 2>&1; echo \"=npm=\"; npm -v 2>&1; echo \"=pm2=\"; \\(pm2 -v 2>&1 || echo none\\); echo \"=nginx=\"; \\(nginx -v 2>&1 || echo none\\); echo \"=git=\"; git --version 2>&1; echo \"=repo populated?=\"; git ls-remote https://github.com/ddotsmedia/kayakalpam.git 2>&1 | head -5; echo \"=pm2 list=\"; \\(pm2 jlist 2>/dev/null | head -c 300 || echo none\\)')",
+      "Bash(tar czf *)",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=10 root@194.164.151.202 'mkdir -p /opt/kayakalpam && tar xzf - -C /opt/kayakalpam && echo \"=== extracted ===\" && ls /opt/kayakalpam | head -30')",
+      "Bash(ssh -o *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'chore\\(deploy\\): add PM2 ecosystem config, set production domain *)",
+      "Bash(curl -s https://kayakalpamvaidyasala.com/)",
+      "Bash(curl -s https://kayakalpamvaidyasala.com/faq)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'fix: replace Ayurveda with Traditional in page titles and meta *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'feat\\(ui\\): professional redesign — navbar, hero, cards, books strip *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'feat\\(navbar\\): add phone number to top bar *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'fix\\(ui\\): mobile responsive — banner wrap, hero badge, trust bar *)",
+      "Bash(git -c 'user.name=Claude Code' -c user.email=noreply@anthropic.com commit -q -m 'fix\\(mobile\\): hero pill width, banner overlap, WA FAB position *)"
+    ]
+  }
+}
