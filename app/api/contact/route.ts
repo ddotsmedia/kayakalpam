@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { contactSchema } from "@/lib/contactSchema";
 import { readData, writeData } from "@/lib/admin-data";
 import type { Submission } from "@/lib/admin-data";
+import { sanitise } from "@/lib/sanitise";
 
 const WINDOW_MS = 60 * 60 * 1000;
 const LIMIT = 5;
@@ -41,7 +42,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Validation failed." }, { status: 422 });
   }
 
-  const { name, phone, email, treatmentInterest, message, type, country } = parsed.data;
+  // Sanitise every user-supplied field (defence-in-depth on top of zod).
+  const name = sanitise.text(parsed.data.name, 80);
+  const phone = sanitise.phone(parsed.data.phone);
+  const treatmentInterest = sanitise.text(parsed.data.treatmentInterest, 80);
+  const message = sanitise.text(parsed.data.message, 2000);
+  const email = parsed.data.email ? sanitise.text(parsed.data.email, 254) : "";
+  const type = parsed.data.type ? sanitise.text(parsed.data.type, 40) : undefined;
+  const country = parsed.data.country ? sanitise.text(parsed.data.country, 60) : undefined;
 
   // Persist to the admin inbox (best-effort) regardless of email delivery.
   try {
@@ -50,7 +58,7 @@ export async function POST(req: Request) {
       id: Date.now().toString(),
       name,
       phone,
-      email: email || "",
+      email,
       treatmentInterest,
       message,
       createdAt: new Date().toISOString(),
