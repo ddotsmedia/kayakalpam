@@ -7,6 +7,8 @@ import BlogClient from "@/components/sections/BlogClient";
 import CtaBanner from "@/components/sections/CtaBanner";
 import { getArticles } from "@/lib/articlesData";
 import { formatDate } from "@/lib/articles";
+import { readData } from "@/lib/data";
+import { defaultCategories, categoryLabel, type Category } from "@/lib/categories";
 
 export function generateMetadata(): Metadata {
   return buildMetadata("/blog");
@@ -16,6 +18,7 @@ export default function BlogPage() {
   const articles = [...getArticles()].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = articles.filter((a) => a.id !== featured?.id);
+  const cats = readData<Category[]>("categories", defaultCategories);
 
   return (
     <>
@@ -35,7 +38,7 @@ export default function BlogPage() {
               <div className="relative aspect-[16/10] md:aspect-auto">
                 <Image src={featured.coverImage} alt={featured.titleEn} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
                 <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-white">
-                  Featured · {featured.category}
+                  Featured · {categoryLabel(featured.category, cats)}
                 </span>
               </div>
               <div className="flex flex-col justify-center p-6 md:p-8">
@@ -50,7 +53,7 @@ export default function BlogPage() {
             </Link>
           )}
 
-          <BlogClient articles={rest} />
+          <BlogClient articles={rest} categories={cats.map((c) => ({ id: c.id, label: c.label }))} />
         </div>
       </section>
 

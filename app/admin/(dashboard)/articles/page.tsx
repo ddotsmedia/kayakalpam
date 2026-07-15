@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Trash2, Pencil, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Plus, Trash2, Pencil, ArrowLeft, Tag } from "lucide-react";
 import {
   PageTitle,
   Field,
@@ -35,14 +36,7 @@ type Article = {
   readTimeMinutes: number;
 };
 type MediaFile = { name: string; path: string };
-
-const CATEGORIES = [
-  "Health Tips",
-  "Treatments",
-  "Seasonal",
-  "Visha Chikitsa",
-  "Classical Medicines",
-];
+type Category = { id: string; label: string; labelMl: string };
 
 type FormState = {
   id?: string;
@@ -61,7 +55,7 @@ type FormState = {
 const emptyForm: FormState = {
   titleEn: "",
   titleMl: "",
-  category: "Health Tips",
+  category: "health-tips",
   tags: "",
   excerpt: "",
   contentEn: "",
@@ -73,6 +67,7 @@ const emptyForm: FormState = {
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [images, setImages] = useState<MediaFile[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [editing, setEditing] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
   const { show, node } = useToast();
@@ -86,10 +81,16 @@ export default function ArticlesPage() {
     apiJson<MediaFile[]>("/api/admin/media/list", "GET").then(({ data }) =>
       setImages(Array.isArray(data) ? data : []),
     );
+    apiJson<Category[]>("/api/admin/categories", "GET").then(({ data }) =>
+      setCategories(Array.isArray(data) ? data : []),
+    );
   }, []);
 
+  const categoryLabel = (value: string) =>
+    categories.find((c) => c.id === value || c.label === value)?.label ?? value;
+
   function startNew() {
-    setEditing({ ...emptyForm });
+    setEditing({ ...emptyForm, category: categories[0]?.id ?? "health-tips" });
   }
   function startEdit(a: Article) {
     setEditing({
@@ -161,18 +162,31 @@ export default function ArticlesPage() {
             <Field label="Title ML" value={editing.titleMl} onChange={(v) => setEditing({ ...editing, titleMl: v })} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className={labelCls}>Category</span>
-              <select
-                value={editing.category}
-                onChange={(e) => setEditing({ ...editing, category: e.target.value })}
-                className={inputCls}
+            <div>
+              <label className="block">
+                <span className={labelCls}>Category</span>
+                <select
+                  value={editing.category}
+                  onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+                  className={inputCls}
+                >
+                  {!categories.some((c) => c.id === editing.category || c.label === editing.category) && (
+                    <option value={editing.category}>{editing.category}</option>
+                  )}
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Link
+                href="/admin/articles/categories"
+                className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-[#2d6a4f] hover:underline"
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </select>
-            </label>
+                <Tag className="h-3 w-3" /> Manage Categories →
+              </Link>
+            </div>
             <Field label="Tags (comma-separated)" value={editing.tags} onChange={(v) => setEditing({ ...editing, tags: v })} />
           </div>
           <TextArea label="Excerpt (max 200)" maxLength={200} value={editing.excerpt} onChange={(v) => setEditing({ ...editing, excerpt: v })} />
@@ -230,9 +244,14 @@ export default function ArticlesPage() {
     <div>
       <div className="flex items-center justify-between">
         <PageTitle title="Articles" subtitle={`${articles.length} articles`} />
-        <button className={btnPrimary} onClick={startNew}>
-          <Plus className="h-4 w-4" /> New Article
-        </button>
+        <div className="flex gap-2">
+          <Link href="/admin/articles/categories" className={btnGhost}>
+            <Tag className="h-4 w-4" /> Manage Categories
+          </Link>
+          <button className={btnPrimary} onClick={startNew}>
+            <Plus className="h-4 w-4" /> New Article
+          </button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -251,7 +270,7 @@ export default function ArticlesPage() {
               {articles.map((a) => (
                 <tr key={a.id} className="border-t border-gray-100">
                   <td className="px-4 py-3 font-medium text-gray-800">{a.titleEn}</td>
-                  <td className="px-4 py-3 text-gray-600">{a.category}</td>
+                  <td className="px-4 py-3 text-gray-600">{categoryLabel(a.category)}</td>
                   <td className="px-4 py-3 text-gray-500">
                     {new Date(a.publishedAt).toLocaleDateString("en-IN")}
                   </td>

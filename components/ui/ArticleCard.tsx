@@ -2,13 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatDate, type Article } from "@/lib/articles";
 
-export default function ArticleCard({ a }: { a: Article }) {
+export default function ArticleCard({ a, categoryLabel }: { a: Article; categoryLabel?: string }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm">
       <Link href={`/blog/${a.slug}`} className="relative block aspect-[16/9] overflow-hidden">
         <Image src={a.coverImage} alt={a.titleEn} fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover" />
         <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-white">
-          {a.category}
+          {categoryLabel ?? a.category}
         </span>
       </Link>
       <div className="flex flex-1 flex-col p-5">

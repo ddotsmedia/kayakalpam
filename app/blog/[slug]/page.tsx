@@ -9,6 +9,8 @@ import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd } from "@/lib/seo-meta";
 import { getArticles, getArticle } from "@/lib/articlesData";
 import { formatDate } from "@/lib/articles";
+import { readData } from "@/lib/data";
+import { defaultCategories, categoryLabel, type Category } from "@/lib/categories";
 import { site, waLink } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -50,6 +52,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     .filter((x) => x.category === a.category && x.id !== a.id)
     .slice(0, 2);
   const url = `${site.url}/blog/${a.slug}`;
+  const cats = readData<Category[]>("categories", defaultCategories);
+  const catLabel = categoryLabel(a.category, cats);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -84,7 +88,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <Image src={a.coverImage} alt={a.titleEn} fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/90 to-primary-dark/40" />
         <div className="relative mx-auto w-full max-w-4xl px-4 py-10 text-white">
-          <span className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold">{a.category}</span>
+          <span className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold">{catLabel}</span>
           <h1 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">{a.titleEn}</h1>
           <p className="font-ml mt-1 text-secondary">{a.titleMl}</p>
         </div>
@@ -120,7 +124,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <div className="space-y-4">
                 <h3 className="font-heading font-bold text-accent">Related Articles</h3>
                 {related.map((r) => (
-                  <ArticleCard key={r.id} a={r} />
+                  <ArticleCard key={r.id} a={r} categoryLabel={categoryLabel(r.category, cats)} />
                 ))}
               </div>
             )}
