@@ -6,7 +6,11 @@ export default function ArticleCard({ a, categoryLabel }: { a: Article; category
   return (
     <article className="flex flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm">
       <Link href={`/blog/${a.slug}`} className="relative block aspect-[16/9] overflow-hidden">
-        <Image src={a.coverImage} alt={a.titleEn} fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover" />
+        {a.coverImage ? (
+          <Image src={a.coverImage} alt={a.titleEn} fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover" />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark" />
+        )}
         <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-white">
           {categoryLabel ?? a.category}
         </span>

@@ -36,7 +36,11 @@ export default function BlogPage() {
               className="mb-10 grid overflow-hidden rounded-2xl border border-secondary/40 bg-white shadow-sm md:grid-cols-2"
             >
               <div className="relative aspect-[16/10] md:aspect-auto">
-                <Image src={featured.coverImage} alt={featured.titleEn} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
+                {featured.coverImage ? (
+                  <Image src={featured.coverImage} alt={featured.titleEn} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark" />
+                )}
                 <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-white">
                   Featured · {categoryLabel(featured.category, cats)}
                 </span>

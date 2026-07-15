@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     publishedAt: now,
     updatedAt: now,
     featured: Boolean(b.featured),
-    coverImage: sanitise.text(b.coverImage, 200) || "/images/hero.jpg",
+    coverImage: b.coverImage ? sanitise.text(b.coverImage, 200) : "",
     readTimeMinutes: readTime(contentEn),
   };
 

@@ -26,6 +26,7 @@ export async function generateMetadata({
   const a = getArticle(slug);
   if (!a) return { title: "Article Not Found" };
   const canonical = `${site.url}/blog/${a.slug}`;
+  const ogImage = a.coverImage || "/images/hero.jpg";
   return {
     title: `${a.titleEn} | Articles`,
     description: a.excerpt,
@@ -37,9 +38,9 @@ export async function generateMetadata({
       url: canonical,
       publishedTime: a.publishedAt,
       modifiedTime: a.updatedAt,
-      images: [{ url: a.coverImage }],
+      images: [{ url: ogImage }],
     },
-    twitter: { card: "summary_large_image", title: a.titleEn, description: a.excerpt, images: [a.coverImage] },
+    twitter: { card: "summary_large_image", title: a.titleEn, description: a.excerpt, images: [ogImage] },
   };
 }
 
@@ -60,7 +61,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "@type": "Article",
     headline: a.titleEn,
     description: a.excerpt,
-    image: `${site.url}${a.coverImage}`,
+    image: `${site.url}${a.coverImage || "/images/hero.jpg"}`,
     author: { "@type": "Person", name: a.author },
     publisher: {
       "@type": "Organization",
@@ -84,8 +85,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         ])}
       />
 
-      <section className="relative isolate flex min-h-[40vh] items-end">
-        <Image src={a.coverImage} alt={a.titleEn} fill priority sizes="100vw" className="object-cover" />
+      <section className="relative isolate flex min-h-[40vh] items-end bg-primary-dark">
+        {a.coverImage && (
+          <Image src={a.coverImage} alt={a.titleEn} fill priority sizes="100vw" className="object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/90 to-primary-dark/40" />
         <div className="relative mx-auto w-full max-w-4xl px-4 py-10 text-white">
           <span className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold">{catLabel}</span>

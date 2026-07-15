@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Plus, Trash2, Pencil, ArrowLeft, Tag } from "lucide-react";
 import {
@@ -35,7 +34,6 @@ type Article = {
   coverImage: string;
   readTimeMinutes: number;
 };
-type MediaFile = { name: string; path: string };
 type Category = { id: string; label: string; labelMl: string };
 
 type FormState = {
@@ -60,16 +58,18 @@ const emptyForm: FormState = {
   excerpt: "",
   contentEn: "",
   contentMl: "",
-  coverImage: "/images/hero.jpg",
+  coverImage: "",
   featured: false,
 };
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [images, setImages] = useState<MediaFile[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editing, setEditing] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const { show, node } = useToast();
 
   async function load() {
@@ -78,9 +78,6 @@ export default function ArticlesPage() {
   }
   useEffect(() => {
     load();
-    apiJson<MediaFile[]>("/api/admin/media/list", "GET").then(({ data }) =>
-      setImages(Array.isArray(data) ? data : []),
-    );
     apiJson<Category[]>("/api/admin/categories", "GET").then(({ data }) =>
       setCategories(Array.isArray(data) ? data : []),
     );
@@ -88,6 +85,30 @@ export default function ArticlesPage() {
 
   const categoryLabel = (value: string) =>
     categories.find((c) => c.id === value || c.label === value)?.label ?? value;
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    setUploading(true);
+    try {
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.ok) {
+        setEditing((prev) => (prev ? { ...prev, coverImage: data.path } : prev));
+      } else {
+        alert(data.error ?? "Upload failed");
+      }
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   function startNew() {
     setEditing({ ...emptyForm, category: categories[0]?.id ?? "health-tips" });
@@ -144,6 +165,8 @@ export default function ArticlesPage() {
   }
 
   if (editing) {
+    const coverImage = editing.coverImage;
+    const setCoverImage = (v: string) => setEditing((p) => (p ? { ...p, coverImage: v } : p));
     return (
       <div className="max-w-3xl">
         <button className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700" onClick={() => setEditing(null)}>
@@ -193,28 +216,92 @@ export default function ArticlesPage() {
           <TextArea label="Content EN (HTML allowed)" rows={10} value={editing.contentEn} onChange={(v) => setEditing({ ...editing, contentEn: v })} />
           <TextArea label="Content ML (optional)" rows={6} value={editing.contentMl} onChange={(v) => setEditing({ ...editing, contentMl: v })} />
 
-          <label className="block">
-            <span className={labelCls}>Cover Image</span>
-            <select
-              value={editing.coverImage}
-              onChange={(e) => setEditing({ ...editing, coverImage: e.target.value })}
-              className={inputCls}
-            >
-              {images.map((im) => (
-                <option key={im.path} value={im.path}>
-                  {im.name}
-                </option>
-              ))}
-              {!images.some((im) => im.path === editing.coverImage) && (
-                <option value={editing.coverImage}>{editing.coverImage}</option>
-              )}
-            </select>
-            {editing.coverImage && (
-              <div className="relative mt-2 h-32 w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
-                <Image src={editing.coverImage} alt="cover" fill sizes="320px" className="object-cover" />
+          {/* Cover image */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ color: "#C9962A", fontWeight: 500 }}>
+              Cover Image
+              <span style={{ color: "#888", fontWeight: 400, fontSize: 12, marginLeft: 6 }}>(optional)</span>
+            </label>
+
+            {coverImage && (
+              <div style={{ marginTop: 8, position: "relative", display: "inline-block" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverImage}
+                  alt="cover preview"
+                  style={{ width: 200, height: 130, objectFit: "cover", borderRadius: 8, display: "block" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setCoverImage("")}
+                  style={{
+                    position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.6)", color: "#fff",
+                    border: "none", borderRadius: "50%", width: 24, height: 24, cursor: "pointer",
+                    fontSize: 14, lineHeight: "24px", textAlign: "center",
+                  }}
+                >
+                  ×
+                </button>
               </div>
             )}
-          </label>
+
+            {!coverImage && (
+              <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <label
+                  style={{
+                    cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "8px 14px", border: "1px solid #2D6A4F", borderRadius: 6, color: "#2D6A4F",
+                    fontSize: 13, fontWeight: 500, background: "#fff",
+                  }}
+                >
+                  <input type="file" accept="image/jpeg,image/png,image/webp" style={{ display: "none" }} onChange={handleCoverUpload} />
+                  {uploading ? "Uploading..." : "↑ Upload Image"}
+                </label>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!existingImages.length) {
+                      const res = await fetch("/api/admin/media/list");
+                      const data = await res.json();
+                      const arr = Array.isArray(data) ? data : (data.files ?? []);
+                      setExistingImages(
+                        arr.map((f: { name?: string; path?: string }) => f.path ?? "/images/" + (f.name ?? "")),
+                      );
+                    }
+                    setShowImagePicker(true);
+                  }}
+                  style={{
+                    padding: "8px 14px", border: "1px solid #ccc", borderRadius: 6, color: "#555",
+                    fontSize: 13, background: "#fff", cursor: "pointer",
+                  }}
+                >
+                  Select from library
+                </button>
+              </div>
+            )}
+
+            {coverImage && (
+              <div style={{ marginTop: 6, display: "flex", gap: 8 }}>
+                <label style={{ cursor: "pointer", fontSize: 12, color: "#2D6A4F", textDecoration: "underline" }}>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" style={{ display: "none" }} onChange={handleCoverUpload} />
+                  Replace image
+                </label>
+                <span style={{ color: "#ccc" }}>|</span>
+                <button
+                  type="button"
+                  onClick={() => setCoverImage("")}
+                  style={{ fontSize: 12, color: "#888", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            <p style={{ fontSize: 11, color: "#aaa", marginTop: 6 }}>
+              JPG, PNG or WebP · Max 5MB · Leave empty for no cover image
+            </p>
+          </div>
 
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <input
@@ -235,6 +322,46 @@ export default function ArticlesPage() {
             </button>
           </div>
         </div>
+
+        {/* Image picker modal */}
+        {showImagePicker && (
+          <div
+            style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}
+            onClick={() => setShowImagePicker(false)}
+          >
+            <div
+              style={{ background: "#fff", borderRadius: 12, padding: 24, maxWidth: 600, width: "90%", maxHeight: "80vh", overflow: "auto" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ margin: 0 }}>Select Cover Image</h3>
+                <button type="button" onClick={() => setShowImagePicker(false)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer" }}>
+                  ×
+                </button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+                {existingImages.map((img) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={img}
+                    src={img}
+                    alt={img.split("/").pop()}
+                    onClick={() => {
+                      setCoverImage(img);
+                      setShowImagePicker(false);
+                    }}
+                    style={{ width: "100%", height: 90, objectFit: "cover", borderRadius: 6, cursor: "pointer", border: "2px solid transparent" }}
+                    onMouseOver={(e) => (e.currentTarget.style.border = "2px solid #C9962A")}
+                    onMouseOut={(e) => (e.currentTarget.style.border = "2px solid transparent")}
+                  />
+                ))}
+              </div>
+              {!existingImages.length && (
+                <p style={{ color: "#888", textAlign: "center" }}>No images in library yet. Upload one above.</p>
+              )}
+            </div>
+          </div>
+        )}
         {node}
       </div>
     );
