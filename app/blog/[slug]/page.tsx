@@ -8,13 +8,16 @@ import ArticleCard from "@/components/ui/ArticleCard";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbLd } from "@/lib/seo-meta";
 import { getArticles, getArticle } from "@/lib/articlesData";
-import { formatDate } from "@/lib/articles";
+import { formatDate, isPublished } from "@/lib/articles";
 import { readData } from "@/lib/data";
 import { defaultCategories, categoryLabel, type Category } from "@/lib/categories";
 import { site, waLink } from "@/lib/site";
 
+// Drafts are not pre-rendered (keeps them out of the sitemap too).
 export function generateStaticParams() {
-  return getArticles().map((a) => ({ slug: a.slug }));
+  return getArticles()
+    .filter(isPublished)
+    .map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({
@@ -24,7 +27,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const a = getArticle(slug);
-  if (!a) return { title: "Article Not Found" };
+  if (!a || !isPublished(a)) return { title: "Article Not Found" };
   const canonical = `${site.url}/blog/${a.slug}`;
   const ogImage = a.coverImage || "/images/hero.jpg";
   return {
@@ -47,10 +50,10 @@ export async function generateMetadata({
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const a = getArticle(slug);
-  if (!a) notFound();
+  if (!a || !isPublished(a)) notFound();
 
   const related = getArticles()
-    .filter((x) => x.category === a.category && x.id !== a.id)
+    .filter((x) => isPublished(x) && x.category === a.category && x.id !== a.id)
     .slice(0, 2);
   const url = `${site.url}/blog/${a.slug}`;
   const cats = readData<Category[]>("categories", defaultCategories);

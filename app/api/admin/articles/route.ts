@@ -21,6 +21,10 @@ function toTags(raw: unknown): string[] {
   return arr.map((t) => sanitise.text(t, 40)).filter(Boolean);
 }
 
+function toStatus(raw: unknown): "published" | "draft" {
+  return raw === "draft" ? "draft" : "published";
+}
+
 export async function GET() {
   return NextResponse.json(all());
 }
@@ -38,6 +42,7 @@ export async function POST(req: Request) {
   while (arr.some((a) => a.slug === slug)) slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
 
   const contentEn = sanitise.html(b.contentEn);
+  const featured = Boolean(b.featured);
   const article: Article = {
     id: Date.now().toString(),
     slug,
@@ -51,13 +56,16 @@ export async function POST(req: Request) {
     author: sanitise.text(b.author, 80) || "Vaidyar Shine Bhaskar",
     publishedAt: now,
     updatedAt: now,
-    featured: Boolean(b.featured),
+    featured,
     coverImage: b.coverImage ? sanitise.text(b.coverImage, 200) : "",
     readTimeMinutes: readTime(contentEn),
+    status: toStatus(b.status),
   };
 
-  arr.push(article);
-  writeData("articles", arr);
+  // Featured is exclusive — untick every other article when this one is featured.
+  const next = featured ? arr.map((a) => ({ ...a, featured: false })) : arr;
+  next.push(article);
+  writeData("articles", next);
   revalidatePath("/blog");
   revalidatePath(`/blog/${slug}`);
   return NextResponse.json({ ok: true, article });
@@ -88,11 +96,17 @@ export async function PATCH(req: Request) {
     tags: b.tags !== undefined ? toTags(b.tags) : prev.tags,
     coverImage: b.coverImage !== undefined ? sanitise.text(b.coverImage, 200) : prev.coverImage,
     featured: b.featured !== undefined ? Boolean(b.featured) : prev.featured,
+    status: b.status !== undefined ? toStatus(b.status) : (prev.status ?? "published"),
     updatedAt: new Date().toISOString(),
     readTimeMinutes: readTime(contentEn),
   };
-  arr[idx] = updated;
-  writeData("articles", arr);
+
+  // Featured is exclusive — when this request sets featured, untick all others.
+  const makeExclusive = b.featured === true;
+  const next = arr.map((a, i) =>
+    i === idx ? updated : makeExclusive ? { ...a, featured: false } : a,
+  );
+  writeData("articles", next);
   revalidatePath("/blog");
   revalidatePath(`/blog/${updated.slug}`);
   return NextResponse.json({ ok: true, article: updated });

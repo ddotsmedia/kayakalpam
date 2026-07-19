@@ -17,6 +17,8 @@ import {
   apiJson,
 } from "@/components/admin/AdminKit";
 
+type Status = "published" | "draft";
+
 type Article = {
   id: string;
   slug: string;
@@ -33,6 +35,7 @@ type Article = {
   featured: boolean;
   coverImage: string;
   readTimeMinutes: number;
+  status?: Status;
 };
 type Category = { id: string; label: string; labelMl: string };
 
@@ -48,6 +51,7 @@ type FormState = {
   contentMl: string;
   coverImage: string;
   featured: boolean;
+  status: Status;
 };
 
 const emptyForm: FormState = {
@@ -60,6 +64,7 @@ const emptyForm: FormState = {
   contentMl: "",
   coverImage: "",
   featured: false,
+  status: "published",
 };
 
 export default function ArticlesPage() {
@@ -126,6 +131,7 @@ export default function ArticlesPage() {
       contentMl: a.contentMl,
       coverImage: a.coverImage,
       featured: a.featured,
+      status: a.status === "draft" ? "draft" : "published",
     });
   }
 
@@ -311,7 +317,37 @@ export default function ArticlesPage() {
               className="h-4 w-4 accent-[#2d6a4f]"
             />
             Featured article
+            <span className="text-xs text-gray-400">(only one article can be featured)</span>
           </label>
+
+          {/* Status */}
+          <div>
+            <span className={labelCls}>Status</span>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="status"
+                  checked={editing.status !== "draft"}
+                  onChange={() => setEditing({ ...editing, status: "published" })}
+                  className="h-4 w-4 accent-[#2d6a4f]"
+                />
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="text-gray-700">Published — visible on site</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="status"
+                  checked={editing.status === "draft"}
+                  onChange={() => setEditing({ ...editing, status: "draft" })}
+                  className="h-4 w-4 accent-gray-500"
+                />
+                <span className="h-2 w-2 rounded-full bg-gray-400" />
+                <span className="text-gray-700">Draft — not visible on site</span>
+              </label>
+            </div>
+          </div>
 
           <div className="flex gap-2">
             <button className={btnPrimary} disabled={saving} onClick={save}>
@@ -388,6 +424,7 @@ export default function ArticlesPage() {
               <tr className="text-left text-xs uppercase tracking-wide text-gray-400">
                 <th className="px-4 py-3 font-medium">Title</th>
                 <th className="px-4 py-3 font-medium">Category</th>
+                <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Date</th>
                 <th className="px-4 py-3 font-medium">Featured</th>
                 <th className="px-4 py-3" />
@@ -398,6 +435,17 @@ export default function ArticlesPage() {
                 <tr key={a.id} className="border-t border-gray-100">
                   <td className="px-4 py-3 font-medium text-gray-800">{a.titleEn}</td>
                   <td className="px-4 py-3 text-gray-600">{categoryLabel(a.category)}</td>
+                  <td className="px-4 py-3">
+                    {a.status === "draft" ? (
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+                        Draft
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                        Live
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-gray-500">
                     {new Date(a.publishedAt).toLocaleDateString("en-IN")}
                   </td>

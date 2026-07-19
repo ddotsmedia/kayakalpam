@@ -14,6 +14,8 @@ export type Article = {
   featured: boolean;
   coverImage: string;
   readTimeMinutes: number;
+  /** Missing/undefined is treated as "published" (legacy articles). */
+  status?: "published" | "draft";
 };
 
 export const articleCategories = [
@@ -24,6 +26,11 @@ export const articleCategories = [
   "Visha Chikitsa",
   "Classical Medicines",
 ];
+
+/** True when an article should be visible on the public site. */
+export function isPublished(a: { status?: string }): boolean {
+  return a.status !== "draft";
+}
 
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", {

@@ -6,7 +6,7 @@ import Image from "next/image";
 import BlogClient from "@/components/sections/BlogClient";
 import CtaBanner from "@/components/sections/CtaBanner";
 import { getArticles } from "@/lib/articlesData";
-import { formatDate } from "@/lib/articles";
+import { formatDate, isPublished } from "@/lib/articles";
 import { readData } from "@/lib/data";
 import { defaultCategories, categoryLabel, type Category } from "@/lib/categories";
 
@@ -15,7 +15,9 @@ export function generateMetadata(): Metadata {
 }
 
 export default function BlogPage() {
-  const articles = [...getArticles()].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const articles = getArticles()
+    .filter(isPublished)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = articles.filter((a) => a.id !== featured?.id);
   const cats = readData<Category[]>("categories", defaultCategories);
