@@ -6,7 +6,6 @@ import { Plus, Trash2, Pencil, ArrowLeft, Tag } from "lucide-react";
 import {
   PageTitle,
   Field,
-  TextArea,
   btnPrimary,
   btnGhost,
   btnDanger,
@@ -25,7 +24,6 @@ type Article = {
   titleEn: string;
   titleMl: string;
   excerpt: string;
-  contentEn: string;
   contentMl: string;
   category: string;
   tags: string[];
@@ -42,12 +40,11 @@ type Category = { id: string; label: string; labelMl: string };
 type FormState = {
   id?: string;
   slug?: string;
-  titleEn: string;
   titleMl: string;
+  titleEn: string;
   category: string;
   tags: string;
   excerpt: string;
-  contentEn: string;
   contentMl: string;
   coverImage: string;
   featured: boolean;
@@ -55,17 +52,18 @@ type FormState = {
 };
 
 const emptyForm: FormState = {
-  titleEn: "",
   titleMl: "",
+  titleEn: "",
   category: "health-tips",
   tags: "",
   excerpt: "",
-  contentEn: "",
   contentMl: "",
   coverImage: "",
   featured: false,
   status: "published",
 };
+
+const goldLabel = "mb-1 block text-sm font-medium";
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -122,12 +120,11 @@ export default function ArticlesPage() {
     setEditing({
       id: a.id,
       slug: a.slug,
-      titleEn: a.titleEn,
       titleMl: a.titleMl,
+      titleEn: a.titleEn,
       category: a.category,
       tags: (a.tags || []).join(", "),
       excerpt: a.excerpt,
-      contentEn: a.contentEn,
       contentMl: a.contentMl,
       coverImage: a.coverImage,
       featured: a.featured,
@@ -137,16 +134,21 @@ export default function ArticlesPage() {
 
   async function save() {
     if (!editing) return;
-    if (!editing.titleEn.trim()) {
-      show("Title EN is required", "err");
+    if (!editing.titleMl.trim()) {
+      show("Malayalam title is required", "err");
+      return;
+    }
+    if (!editing.contentMl.trim()) {
+      show("Malayalam content is required", "err");
       return;
     }
     setSaving(true);
     const method = editing.id ? "PATCH" : "POST";
-    const { ok } = await apiJson("/api/admin/articles", method, editing);
+    const payload = { ...editing, titleEn: editing.titleEn.trim() || undefined };
+    const { ok } = await apiJson("/api/admin/articles", method, payload);
     setSaving(false);
     if (ok) {
-      show(editing.id ? "Updated ✓" : "Published ✓");
+      show(editing.id ? "Saved ✓" : "Published ✓");
       setEditing(null);
       load();
     } else {
@@ -186,10 +188,45 @@ export default function ArticlesPage() {
         )}
 
         <div className={`${card} space-y-4`}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Title EN" value={editing.titleEn} onChange={(v) => setEditing({ ...editing, titleEn: v })} />
-            <Field label="Title ML" value={editing.titleMl} onChange={(v) => setEditing({ ...editing, titleMl: v })} />
+          {/* Title (Malayalam) — required */}
+          <div>
+            <span className={goldLabel} style={{ color: "#C9962A" }}>Title (Malayalam) *</span>
+            <input
+              value={editing.titleMl}
+              onChange={(e) => setEditing({ ...editing, titleMl: e.target.value })}
+              placeholder="ലേഖനത്തിന്റെ തലക്കെട്ട്"
+              className={`${inputCls} font-ml`}
+            />
           </div>
+
+          {/* English Title — optional */}
+          <div>
+            <span className="mb-1 block text-sm" style={{ color: "#888", fontWeight: 400 }}>
+              English Title (optional)
+            </span>
+            <input
+              value={editing.titleEn}
+              onChange={(e) => setEditing({ ...editing, titleEn: e.target.value })}
+              placeholder="English title for SEO (optional)"
+              className={inputCls}
+            />
+            <p className="mt-1 text-xs text-gray-400">Used for URL slug and international SEO only</p>
+          </div>
+
+          {/* Excerpt (Malayalam) — required */}
+          <div>
+            <span className={goldLabel} style={{ color: "#C9962A" }}>Excerpt (Malayalam) *</span>
+            <textarea
+              rows={3}
+              maxLength={300}
+              value={editing.excerpt}
+              onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })}
+              placeholder="ചെറു വിവരണം"
+              className={`${inputCls} font-ml`}
+            />
+          </div>
+
+          {/* Category + Tags */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="block">
@@ -218,9 +255,18 @@ export default function ArticlesPage() {
             </div>
             <Field label="Tags (comma-separated)" value={editing.tags} onChange={(v) => setEditing({ ...editing, tags: v })} />
           </div>
-          <TextArea label="Excerpt (max 200)" maxLength={200} value={editing.excerpt} onChange={(v) => setEditing({ ...editing, excerpt: v })} />
-          <TextArea label="Content EN (HTML allowed)" rows={10} value={editing.contentEn} onChange={(v) => setEditing({ ...editing, contentEn: v })} />
-          <TextArea label="Content ML (optional)" rows={6} value={editing.contentMl} onChange={(v) => setEditing({ ...editing, contentMl: v })} />
+
+          {/* Content (Malayalam) — required */}
+          <div>
+            <span className={goldLabel} style={{ color: "#C9962A" }}>Content (Malayalam) *</span>
+            <textarea
+              rows={12}
+              value={editing.contentMl}
+              onChange={(e) => setEditing({ ...editing, contentMl: e.target.value })}
+              placeholder="ലേഖനത്തിന്റെ ഉള്ളടക്കം (HTML അനുവദനീയം)"
+              className={`${inputCls} font-ml`}
+            />
+          </div>
 
           {/* Cover image */}
           <div style={{ marginBottom: 16 }}>
@@ -351,7 +397,7 @@ export default function ArticlesPage() {
 
           <div className="flex gap-2">
             <button className={btnPrimary} disabled={saving} onClick={save}>
-              {editing.id ? "Save Changes" : "Publish Article"}
+              {editing.id ? "Save Changes" : editing.status === "draft" ? "Save Draft" : "Publish Article"}
             </button>
             <button className={btnGhost} onClick={() => setEditing(null)}>
               Cancel
@@ -433,7 +479,7 @@ export default function ArticlesPage() {
             <tbody>
               {articles.map((a) => (
                 <tr key={a.id} className="border-t border-gray-100">
-                  <td className="px-4 py-3 font-medium text-gray-800">{a.titleEn}</td>
+                  <td className="font-ml px-4 py-3 font-medium text-gray-800">{a.titleMl || a.titleEn}</td>
                   <td className="px-4 py-3 text-gray-600">{categoryLabel(a.category)}</td>
                   <td className="px-4 py-3">
                     {a.status === "draft" ? (

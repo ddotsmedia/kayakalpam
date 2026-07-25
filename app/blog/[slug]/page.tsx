@@ -28,22 +28,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const a = getArticle(slug);
   if (!a || !isPublished(a)) return { title: "Article Not Found" };
+  const seoTitle = a.titleEn || a.titleMl;
   const canonical = `${site.url}/blog/${a.slug}`;
   const ogImage = a.coverImage || "/images/hero.jpg";
   return {
-    title: `${a.titleEn} | Articles`,
+    title: `${seoTitle} | Articles`,
     description: a.excerpt,
     alternates: { canonical: `/blog/${a.slug}` },
     openGraph: {
       type: "article",
-      title: a.titleEn,
+      title: seoTitle,
       description: a.excerpt,
       url: canonical,
       publishedTime: a.publishedAt,
       modifiedTime: a.updatedAt,
       images: [{ url: ogImage }],
     },
-    twitter: { card: "summary_large_image", title: a.titleEn, description: a.excerpt, images: [ogImage] },
+    twitter: { card: "summary_large_image", title: seoTitle, description: a.excerpt, images: [ogImage] },
   };
 }
 
@@ -58,11 +59,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const url = `${site.url}/blog/${a.slug}`;
   const cats = readData<Category[]>("categories", defaultCategories);
   const catLabel = categoryLabel(a.category, cats);
+  const titleMain = a.titleMl || a.titleEn;
+  const seoTitle = a.titleEn || a.titleMl;
 
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: a.titleEn,
+    headline: seoTitle,
+    ...(a.titleMl && a.titleEn ? { alternativeHeadline: a.titleMl } : {}),
     description: a.excerpt,
     image: `${site.url}${a.coverImage || "/images/hero.jpg"}`,
     author: { "@type": "Person", name: a.author },
@@ -84,19 +88,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         data={breadcrumbLd([
           ["Home", "/"],
           ["Articles", "/blog"],
-          [a.titleEn, `/blog/${a.slug}`],
+          [seoTitle, `/blog/${a.slug}`],
         ])}
       />
 
       <section className="relative isolate flex min-h-[40vh] items-end bg-primary-dark">
         {a.coverImage && (
-          <Image src={a.coverImage} alt={a.titleEn} fill priority sizes="100vw" className="object-cover" />
+          <Image src={a.coverImage} alt={titleMain} fill priority sizes="100vw" className="object-cover" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/90 to-primary-dark/40" />
         <div className="relative mx-auto w-full max-w-4xl px-4 py-10 text-white">
           <span className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold">{catLabel}</span>
-          <h1 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">{a.titleEn}</h1>
-          <p className="font-ml mt-1 text-secondary">{a.titleMl}</p>
+          <h1 className="font-ml mt-3 font-heading text-3xl font-bold sm:text-4xl">{titleMain}</h1>
+          {a.titleMl && a.titleEn && <p className="mt-1 text-secondary">{a.titleEn}</p>}
         </div>
       </section>
 
@@ -104,7 +108,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <nav className="mb-6 text-sm text-muted">
           <Link href="/" className="hover:text-primary">Home</Link> →{" "}
           <Link href="/blog" className="hover:text-primary">Articles</Link> →{" "}
-          <span className="text-accent">{a.titleEn}</span>
+          <span className="font-ml text-accent">{titleMain}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
@@ -114,7 +118,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </div>
             <ArticleBody en={a.contentEn} ml={a.contentMl} />
             <div className="mt-8 border-t border-primary/10 pt-6">
-              <ShareRow url={url} title={a.titleEn} />
+              <ShareRow url={url} title={titleMain} />
             </div>
           </article>
 

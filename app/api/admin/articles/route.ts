@@ -36,21 +36,25 @@ export async function POST(req: Request) {
   const b = await req.json().catch(() => ({}));
   const arr = all();
   const now = new Date().toISOString();
-  const titleEn: string = sanitise.text(b.titleEn, 200) || "Untitled";
 
+  const titleMl = sanitise.text(b.titleMl, 200);
+  const titleEn = b.titleEn ? sanitise.text(b.titleEn, 200) : "";
+  const contentMl = sanitise.html(b.contentMl);
+  const excerpt = sanitise.text(b.excerpt, 300);
+  if (!titleMl) return NextResponse.json({ error: "Malayalam title is required" }, { status: 422 });
+
+  // Slug comes from the optional English title; else a timestamp fallback.
   let slug = sanitise.slug(slugify(titleEn)) || Date.now().toString();
   while (arr.some((a) => a.slug === slug)) slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
 
-  const contentEn = sanitise.html(b.contentEn);
   const featured = Boolean(b.featured);
   const article: Article = {
     id: Date.now().toString(),
     slug,
     titleEn,
-    titleMl: sanitise.text(b.titleMl, 200),
-    excerpt: sanitise.text(b.excerpt, 300),
-    contentEn,
-    contentMl: sanitise.html(b.contentMl),
+    titleMl,
+    excerpt,
+    contentMl,
     category: sanitise.text(b.category, 60) || "Health Tips",
     tags: toTags(b.tags),
     author: sanitise.text(b.author, 80) || "Vaidyar Shine Bhaskar",
@@ -58,7 +62,7 @@ export async function POST(req: Request) {
     updatedAt: now,
     featured,
     coverImage: b.coverImage ? sanitise.text(b.coverImage, 200) : "",
-    readTimeMinutes: readTime(contentEn),
+    readTimeMinutes: readTime(contentMl),
     status: toStatus(b.status),
   };
 
@@ -83,22 +87,22 @@ export async function PATCH(req: Request) {
   if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const prev = arr[idx];
-  const contentEn = b.contentEn !== undefined ? sanitise.html(b.contentEn) : prev.contentEn;
+  // contentEn is legacy-only: never accepted here, but preserved via ...prev.
+  const contentMl = b.contentMl !== undefined ? sanitise.html(b.contentMl) : prev.contentMl;
 
   const updated: Article = {
     ...prev,
     titleEn: b.titleEn !== undefined ? sanitise.text(b.titleEn, 200) : prev.titleEn,
     titleMl: b.titleMl !== undefined ? sanitise.text(b.titleMl, 200) : prev.titleMl,
     excerpt: b.excerpt !== undefined ? sanitise.text(b.excerpt, 300) : prev.excerpt,
-    contentEn,
-    contentMl: b.contentMl !== undefined ? sanitise.html(b.contentMl) : prev.contentMl,
+    contentMl,
     category: b.category !== undefined ? sanitise.text(b.category, 60) : prev.category,
     tags: b.tags !== undefined ? toTags(b.tags) : prev.tags,
     coverImage: b.coverImage !== undefined ? sanitise.text(b.coverImage, 200) : prev.coverImage,
     featured: b.featured !== undefined ? Boolean(b.featured) : prev.featured,
     status: b.status !== undefined ? toStatus(b.status) : (prev.status ?? "published"),
     updatedAt: new Date().toISOString(),
-    readTimeMinutes: readTime(contentEn),
+    readTimeMinutes: readTime(contentMl || prev.contentEn || ""),
   };
 
   // Featured is exclusive — when this request sets featured, untick all others.

@@ -4,7 +4,8 @@ export type Article = {
   titleEn: string;
   titleMl: string;
   excerpt: string;
-  contentEn: string;
+  /** Legacy English body — no longer editable; kept so existing articles still render. */
+  contentEn?: string;
   contentMl: string;
   category: string;
   tags: string[];
@@ -30,6 +31,11 @@ export const articleCategories = [
 /** True when an article should be visible on the public site. */
 export function isPublished(a: { status?: string }): boolean {
   return a.status !== "draft";
+}
+
+/** Public display title — Malayalam-first, falls back to English. */
+export function displayTitle(a: { titleMl?: string; titleEn?: string }): string {
+  return a.titleMl || a.titleEn || "";
 }
 
 export function formatDate(iso: string): string {

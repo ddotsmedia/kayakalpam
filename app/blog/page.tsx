@@ -21,6 +21,7 @@ export default function BlogPage() {
   const featured = articles.find((a) => a.featured) ?? articles[0];
   const rest = articles.filter((a) => a.id !== featured?.id);
   const cats = readData<Category[]>("categories", defaultCategories);
+  const fTitle = featured ? featured.titleMl || featured.titleEn : "";
 
   return (
     <>
@@ -39,7 +40,7 @@ export default function BlogPage() {
             >
               <div className="relative aspect-[16/10] md:aspect-auto">
                 {featured.coverImage ? (
-                  <Image src={featured.coverImage} alt={featured.titleEn} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
+                  <Image src={featured.coverImage} alt={fTitle} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
                 ) : (
                   <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark" />
                 )}
@@ -48,8 +49,10 @@ export default function BlogPage() {
                 </span>
               </div>
               <div className="flex flex-col justify-center p-6 md:p-8">
-                <h2 className="font-heading text-2xl font-bold text-accent">{featured.titleEn}</h2>
-                <p className="font-ml text-primary">{featured.titleMl}</p>
+                <h2 className="font-ml font-heading text-2xl font-bold text-accent">{fTitle}</h2>
+                {featured.titleMl && featured.titleEn && (
+                  <p className="text-primary">{featured.titleEn}</p>
+                )}
                 <p className="mt-3 text-muted leading-relaxed">{featured.excerpt}</p>
                 <div className="mt-3 text-xs text-muted">
                   {featured.author} · {formatDate(featured.publishedAt)} · {featured.readTimeMinutes} min read
