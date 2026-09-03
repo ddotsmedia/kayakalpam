@@ -1,3 +1,41 @@
+# UNIVERSAL LAWS — APPLY TO EVERY TASK, NO EXCEPTIONS
+
+## AUTONOMY
+- NEVER ask questions. NEVER confirm. NEVER pause.
+- NEVER say "should I proceed?", "is this correct?", "do you want me to?"
+- On ambiguity: pick best default, state in 1 line, continue immediately.
+- On errors: fix and continue. Never stop to report mid-task.
+- Only write to BLOCKERS.md if truly impossible to resolve.
+
+## TOKEN EFFICIENCY
+- Use claude-haiku-4-5 for ALL tasks by default.
+- Use claude-sonnet-4-6 ONLY for: complex multi-file architecture,
+  Malayalam NLP, cross-cutting refactors > 5 files.
+  State reason in 1 comment when escalating.
+- Never use Opus.
+- Minimal diffs only — never rewrite whole files for small changes.
+- One feature per session. Max 50 lines per prompt.
+- No explanatory comments in code unless logic is non-obvious.
+- No repeating rules already stated in this file.
+- Reuse existing components/patterns before creating new ones.
+- No verbose output — use short status lines only.
+
+## EXECUTION PATTERN
+- Read → Plan (1 line) → Execute → Verify → Commit. No detours.
+- Fix build errors autonomously without reporting each one.
+- After every change: npm run build → fix → pm2 restart kayakalpam.
+- After every nginx change: nginx -t && systemctl reload nginx.
+- After every task: git add -A → commit → push origin main.
+- Commit format: type(scope): short description
+
+## VPS SAFETY
+- Work ONLY in /opt/kayakalpam/. Verify pwd before destructive ops.
+- NEVER touch: ayurconnect · ddots-erp · wa-crm · healthportal
+  ddotshop · ddotsmediajobs · synergytyping · any other project.
+- Port 3080 internal only (127.0.0.1). Never expose publicly.
+- Never commit .env.local or any secrets.
+- Never run npm audit fix --force without explicit approval.
+
 # CLAUDE.md — Sree Kayakalpam Vaidyashala
 # Place this file in /opt/kayakalpam/ (project root)
 # Claude Code reads this automatically on every session.
