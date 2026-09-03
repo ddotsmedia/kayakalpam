@@ -1,0 +1,74 @@
+import type { Metadata } from "next";
+import { buildMetadata, breadcrumbLd } from "@/lib/seo-meta";
+import JsonLd from "@/components/JsonLd";
+import Link from "next/link";
+import Image from "next/image";
+import BlogClient from "@/components/sections/BlogClient";
+import CtaBanner from "@/components/sections/CtaBanner";
+import { getArticles } from "@/lib/articlesData";
+import { formatDate, isPublished } from "@/lib/articles";
+import { readData } from "@/lib/data";
+import { defaultCategories, categoryLabel, type Category } from "@/lib/categories";
+
+export function generateMetadata(): Metadata {
+  return buildMetadata("/health-tips");
+}
+
+export default function HealthTipsPage() {
+  const articles = getArticles()
+    .filter(isPublished)
+    .filter((a) => a.category === "health-tips")
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  
+  const featured = articles.find((a) => a.featured) ?? articles[0];
+  const rest = articles.filter((a) => a.id !== featured?.id);
+  const cats = readData<Category[]>("categories", defaultCategories);
+  const fTitle = featured ? featured.titleMl || featured.titleEn : "";
+
+  return (
+    <>
+      <JsonLd data={breadcrumbLd([["Home", "/"], ["Articles", "/blog"], ["Health Tips", "/health-tips"]])} />
+      <section className="bg-[#1a3a2a] py-14 text-center text-white">
+        <p className="font-ml text-lg text-secondary">ആരോഗ്യ നുറുങ്ങുകൾ</p>
+        <h1 className="mt-1 font-heading text-4xl font-bold sm:text-5xl">Health Tips</h1>
+      </section>
+
+      <section className="bg-bg py-12">
+        <div className="mx-auto max-w-6xl px-4">
+          {featured && (
+            <Link
+              href={`/blog/${featured.slug}`}
+              className="mb-10 grid overflow-hidden rounded-2xl border border-secondary/40 bg-white shadow-sm md:grid-cols-2"
+            >
+              <div className="relative aspect-[16/10] md:aspect-auto">
+                {featured.coverImage ? (
+                  <Image src={featured.coverImage} alt={fTitle} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark" />
+                )}
+                <span className="absolute left-3 top-3 rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-white">
+                  Featured · {categoryLabel(featured.category, cats)}
+                </span>
+              </div>
+              <div className="flex flex-col justify-center p-6 md:p-8">
+                <h2 className="font-ml font-heading text-2xl font-bold text-accent">{fTitle}</h2>
+                {featured.titleMl && featured.titleEn && (
+                  <p className="text-primary">{featured.titleEn}</p>
+                )}
+                <p className="mt-3 text-muted leading-relaxed">{featured.excerpt}</p>
+                <div className="mt-3 text-xs text-muted">
+                  {featured.author} · {formatDate(featured.publishedAt)} · {featured.readTimeMinutes} min read
+                </div>
+                <span className="mt-4 text-sm font-semibold text-secondary">Read More →</span>
+              </div>
+            </Link>
+          )}
+
+          <BlogClient articles={rest} categories={cats.map((c) => ({ id: c.id, label: c.label }))} />
+        </div>
+      </section>
+
+      <CtaBanner />
+    </>
+  );
+}
