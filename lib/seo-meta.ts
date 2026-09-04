@@ -70,6 +70,12 @@ const defaults: Record<string, SeoEntry> = {
     description:
       "Find your Ayurvedic body type (Prakriti) with our free Vata-Pitta-Kapha quiz. Get personalised treatment recommendations from Vaidyar Shine Bhaskar.",
   },
+  "/health-tips": {
+    title:
+      "Health Tips & Ayurvedic Wellness | Traditional Kerala Remedies | Sree Kayakalpam",
+    description:
+      "Practical Ayurvedic health tips, wellness advice, and traditional Kerala remedies by Vaidyar Shine Bhaskar. Learn about Dosha balancing, seasonal care, and natural healing.",
+  },
   "/karkidaka": {
     title:
       "Karkidaka Chikitsa Malappuram | Monsoon Ayurveda | Sree Kayakalpam Vaidyashala",
