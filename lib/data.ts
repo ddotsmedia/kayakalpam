@@ -11,3 +11,12 @@ export function readData<T>(name: string, fallback: T): T {
     return fallback;
   }
 }
+
+export function writeData<T>(name: string, data: T): void {
+  try {
+    const filePath = path.join(DATA_DIR, `${name}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+  } catch (e) {
+    console.error(`Failed to write data/${name}.json:`, e);
+  }
+}
