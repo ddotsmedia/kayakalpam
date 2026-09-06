@@ -5,6 +5,7 @@ import {
   Appointment,
   BookingSettings,
   isSlotAvailable,
+  generateWhatsAppUrl,
 } from "@/lib/booking";
 
 const bookingSchema = z.object({
@@ -69,13 +70,22 @@ export async function POST(req: NextRequest) {
       status: "pending",
       createdAt: new Date().toISOString(),
       whatsappSent: false,
+      waUrl: "", // will be set below
     };
+
+    appointment.waUrl = generateWhatsAppUrl(appointment);
 
     appointments.push(appointment);
     writeData("appointments", appointments);
 
-    // Send WhatsApp notification (simplified)
-    // TODO: Integrate WhatsApp API
+    // Log to console for admin
+    console.log("[BOOKING] NEW APPOINTMENT:", {
+      id: appointment.id,
+      name: appointment.name,
+      date: appointment.preferredDate,
+      time: appointment.preferredTime,
+      waUrl: appointment.waUrl,
+    });
 
     return NextResponse.json({ ok: true, appointmentId: appointment.id });
   } catch (error) {

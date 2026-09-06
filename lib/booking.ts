@@ -17,6 +17,7 @@ export interface Appointment {
   createdAt: string;
   confirmedAt?: string;
   whatsappSent: boolean;
+  waUrl?: string;
 }
 
 export type BookingSettings = {
@@ -71,4 +72,9 @@ export function getAvailableSlots(
   return settings.timeSlots.filter((time) =>
     isSlotAvailable(date, time, settings, appointments)
   );
+}
+
+export function generateWhatsAppUrl(appointment: Appointment): string {
+  const text = `New booking: ${appointment.name} on ${appointment.preferredDate} at ${appointment.preferredTime}. Treatment: ${appointment.treatmentInterest}. Phone: ${appointment.phone}. Type: ${appointment.consultationType}`;
+  return `https://wa.me/919447412319?text=${encodeURIComponent(text)}`;
 }
