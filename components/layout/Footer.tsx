@@ -21,11 +21,15 @@ export default function Footer() {
           <p className="mt-3 text-sm leading-relaxed text-white/70">{site.tagline}</p>
           <p className="mt-4 max-w-md text-xs leading-relaxed text-white/45">
             Information on this site is for general awareness and does not replace professional
-            medical advice. For any venomous bite or medical emergency, seek immediate hospital care.
-            Treatment outcomes vary by individual.
-          </p>
           <p className="mt-4 text-xs text-white/50">
-            Ddotsmedia Technologies LLC : © {new Date().getFullYear()} {site.name}. All rights reserved.
+            © {new Date().getFullYear()} {site.name}. All rights reserved.
+          </p>
+          <p style={{fontSize:'11px', color:'#888', marginTop:4, display:'block', textAlign:'center'}}>
+            Designed &amp; Developed by{' '}
+            <a href="https://ddotsmedia.com" target="_blank" rel="noopener noreferrer" style={{color:'#C9962A', textDecoration:'none'}}>
+              Ddotsmedia Technologies LLC
+            </a>
+          </p>
           </p>
         </div>
 

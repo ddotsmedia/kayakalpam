@@ -14,7 +14,6 @@ import {
   LogOut,
   Leaf,
   Menu,
-  CalendarDays,
   X,
 } from "lucide-react";
 
@@ -26,7 +25,6 @@ const NAV = [
   { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/articles", label: "Articles", icon: BookOpen },
-  { href: "/admin/appointments", label: "Appointments", icon: CalendarDays },
 ];
 
 export default function AdminShell({
@@ -77,7 +75,7 @@ export default function AdminShell({
             >
               <Icon className="h-[18px] w-[18px]" />
               <span className="flex-1">{label}</span>
-              {href === "/admin/submissions" {href === "/admin/submissions" && unread > 0 && ({href === "/admin/submissions" && unread > 0 && ( unread > 0 {href === "/admin/submissions" && unread > 0 && ({href === "/admin/submissions" && unread > 0 && ( (
+              {href === "/admin/submissions" && unread > 0 && (
                 <span
                   className={`rounded-full px-1.5 py-0.5 text-xs font-bold ${
                     active ? "bg-[#1a3a2a] text-white" : "bg-[#C9962A] text-[#1a3a2a]"

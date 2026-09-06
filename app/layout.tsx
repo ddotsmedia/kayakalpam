@@ -38,6 +38,10 @@ export const metadata: Metadata = {
     images: ["/images/hero.jpg"],
   },
   robots: { index: true, follow: true },
+  other: {
+    'author': 'Ddotsmedia Technologies LLC',
+    'developer': 'https://ddotsmedia.com',
+  },
 };
 
 const jsonLd = {
