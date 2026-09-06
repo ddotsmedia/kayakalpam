@@ -25,7 +25,7 @@ export default function Footer() {
             Treatment outcomes vary by individual.
           </p>
           <p className="mt-4 text-xs text-white/50">
-            © {new Date().getFullYear()} {site.name}. All rights reserved.
+            Ddotsmedia Technologies LLC : © {new Date().getFullYear()} {site.name}. All rights reserved.
           </p>
         </div>
 
